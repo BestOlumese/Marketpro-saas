@@ -14,7 +14,7 @@ export interface CachedProduct {
 interface PendingSale {
   id?: number
   shopId: string
-  items: Array<{ productId: string; quantity: number; price: number }>
+  items: Array<{ productId: string; name: string; quantity: number; price: number }>
   total: number
   paymentMethod: 'cash'
   createdAt: string

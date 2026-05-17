@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { shops } from '@/lib/db/schema'
+import { shops, staff } from '@/lib/db/schema'
 import type { UserRole } from '@/types'
 
 export async function getCurrentRole(): Promise<UserRole | null> {
@@ -25,4 +25,14 @@ export async function getShopId(): Promise<string> {
   })
   if (!shop) throw new Error('SHOP_NOT_FOUND')
   return shop.id
+}
+
+export async function getStaffId(): Promise<string | null> {
+  const { userId } = await auth()
+  if (!userId) return null
+
+  const member = await db.query.staff.findFirst({
+    where: eq(staff.clerkUserId, userId),
+  })
+  return member?.id ?? null
 }

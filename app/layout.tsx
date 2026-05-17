@@ -16,12 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
-      signInFallbackRedirectUrl="/dashboard"
-      signUpFallbackRedirectUrl="/dashboard"
-      allowedRedirectOrigins={[
-        'http://localhost:3000',
-        process.env.NEXT_PUBLIC_APP_URL ?? '',
-      ].filter(Boolean)}
+      allowedRedirectOrigins={['http://localhost:3000', process.env.NEXT_PUBLIC_APP_URL].filter((v): v is string => !!v)}
     >
       <html lang="en" className={`${inter.variable} h-full scroll-smooth antialiased`}>
         <body className="min-h-full bg-zinc-50 text-zinc-900">
