@@ -15,6 +15,7 @@ import {
   Menu,
   Tag,
   Truck,
+  TrendingUp,
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { OfflineBanner } from '@/components/shared/OfflineBanner'
@@ -46,7 +47,15 @@ const navItems: NavItem[] = [
       { label: NAV.INVENTORY_SUPPLIERS,  href: ROUTES.INVENTORY_SUPPLIERS,  icon: Truck },
     ],
   },
-  { label: NAV.REPORTS,  href: ROUTES.REPORTS,  icon: BarChart3 },
+  {
+    label: NAV.REPORTS,
+    href: ROUTES.REPORTS,
+    icon: BarChart3,
+    children: [
+      { label: NAV.REPORTS_PRODUCTS, href: ROUTES.REPORTS_PRODUCTS, icon: TrendingUp },
+      { label: NAV.REPORTS_STAFF,    href: ROUTES.REPORTS_STAFF,    icon: Users },
+    ],
+  },
   { label: NAV.STAFF,    href: ROUTES.STAFF,    icon: Users },
   { label: NAV.AI,       href: ROUTES.AI,       icon: Sparkles },
   { label: NAV.SETTINGS, href: ROUTES.SETTINGS, icon: Settings },

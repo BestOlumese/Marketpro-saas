@@ -9,6 +9,8 @@ export const ROUTES = {
   INVENTORY_CATEGORIES: '/inventory/categories',
   INVENTORY_SUPPLIERS: '/inventory/suppliers',
   REPORTS: '/reports',
+  REPORTS_PRODUCTS: '/reports/products',
+  REPORTS_STAFF: '/reports/staff',
   STAFF: '/staff',
   AI: '/ai',
   SETTINGS: '/settings',
