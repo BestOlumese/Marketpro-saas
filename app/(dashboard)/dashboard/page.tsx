@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const recentSales = summary.data ?? []
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader title="Dashboard" description="Welcome to MarketPro" />
 
       {/* Metric cards */}
@@ -117,7 +117,7 @@ export default function DashboardPage() {
       {!!metrics.data && metrics.data.lowStockCount > 0 && (
         <Link
           href={ROUTES.INVENTORY}
-          className="flex items-center justify-between rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm hover:bg-warning/20 transition-colors"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm hover:bg-warning/20 transition-colors"
         >
           <span className="font-medium text-warning">
             {metrics.data.lowStockCount} product{metrics.data.lowStockCount !== 1 ? 's are' : ' is'} running low on stock

@@ -141,11 +141,10 @@ export function ProductGrid({ products }: ProductGridProps) {
         )}
       </div>
 
-      {scanning && (
-        <div className="rounded-lg overflow-hidden border border-zinc-200 bg-black aspect-video w-full max-w-xs self-center">
-          <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
-        </div>
-      )}
+      {/* Video element always in DOM so videoRef is available when startScan runs */}
+      <div className={`rounded-lg overflow-hidden border border-zinc-200 bg-black aspect-video w-full max-w-xs self-center ${scanning ? '' : 'hidden'}`}>
+        <video ref={videoRef} className="w-full h-full object-cover" muted playsInline autoPlay />
+      </div>
 
       {query.trim().length < MIN_SEARCH ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center select-none">

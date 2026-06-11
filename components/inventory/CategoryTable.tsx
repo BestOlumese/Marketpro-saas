@@ -102,7 +102,7 @@ export function CategoryTable({ categories, isLoading, isReadOnly = false }: Cat
 
   return (
     <>
-      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
         <div className="flex items-center gap-3 p-4 border-b border-zinc-100">
           <Input
             value={search}
@@ -130,50 +130,48 @@ export function CategoryTable({ categories, isLoading, isReadOnly = false }: Cat
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden sm:table-cell">Created</TableHead>
-                  {!isReadOnly && <TableHead className="w-20" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pageItems.map((cat) => (
-                  <TableRow key={cat.id}>
-                    <TableCell className="font-medium text-zinc-900">{cat.name}</TableCell>
-                    <TableCell className="hidden sm:table-cell text-zinc-500 text-sm">
-                      {new Date(cat.createdAt).toLocaleDateString()}
+          <Table className="min-w-100">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-nowrap">Name</TableHead>
+                <TableHead className="whitespace-nowrap">Created</TableHead>
+                {!isReadOnly && <TableHead className="w-20" />}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pageItems.map((cat) => (
+                <TableRow key={cat.id}>
+                  <TableCell className="font-medium text-zinc-900 whitespace-nowrap">{cat.name}</TableCell>
+                  <TableCell className="text-zinc-500 text-sm whitespace-nowrap">
+                    {new Date(cat.createdAt).toLocaleDateString()}
+                  </TableCell>
+                  {!isReadOnly && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => openEdit(cat)}
+                          aria-label={`Edit ${cat.name}`}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setDeleteId(cat.id)}
+                          aria-label={`Delete ${cat.name}`}
+                          className="text-danger hover:text-danger hover:bg-danger/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </TableCell>
-                    {!isReadOnly && (
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => openEdit(cat)}
-                            aria-label={`Edit ${cat.name}`}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => setDeleteId(cat.id)}
-                            aria-label={`Delete ${cat.name}`}
-                            className="text-danger hover:text-danger hover:bg-danger/10"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
 
         {totalPages > 1 && (

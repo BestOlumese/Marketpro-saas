@@ -57,7 +57,7 @@ export function DateRangePicker({ from, to, onChange }: DateRangePickerProps) {
         ))}
       </div>
 
-      <div className="flex items-end gap-2">
+      <div className="flex flex-wrap items-end gap-2">
         <div className="space-y-1">
           <Label htmlFor="rp-from" className="text-xs">{REPORTS.DATE_FROM}</Label>
           <Input

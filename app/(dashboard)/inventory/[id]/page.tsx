@@ -9,7 +9,7 @@ interface EditProductPageProps {
 export default async function EditProductPage({ params }: EditProductPageProps) {
   const { id } = await params
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-2xl">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-2xl">
       <PageHeader
         title={INVENTORY.EDIT_PRODUCT}
         description="Update the product details below."

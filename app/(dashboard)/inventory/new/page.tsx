@@ -4,7 +4,7 @@ import { INVENTORY } from '@/lib/constants/copy'
 
 export default function NewProductPage() {
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-2xl">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-2xl">
       <PageHeader
         title={INVENTORY.NEW_PRODUCT}
         description="Fill in the details below to add a new product."

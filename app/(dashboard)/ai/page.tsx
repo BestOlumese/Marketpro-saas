@@ -247,8 +247,8 @@ function AIContent() {
 
           {/* Weekly Digest */}
           <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
                 <h2 className="text-sm font-semibold text-brand">{AI.DIGEST_TITLE}</h2>
                 <p className="text-xs text-zinc-500">{AI.DIGEST_DESCRIPTION}</p>
               </div>

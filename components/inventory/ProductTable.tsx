@@ -106,7 +106,7 @@ export function ProductTable({ products, isLoading, search, isReadOnly = false }
 
   return (
     <>
-      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
         {/* Filters */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border-b border-zinc-100">
           <select
@@ -138,66 +138,64 @@ export function ProductTable({ products, isLoading, search, isReadOnly = false }
             <p className="text-xs text-zinc-400">{INVENTORY.EMPTY_DESCRIPTION}</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">Barcode</TableHead>
-                  <TableHead className="hidden sm:table-cell">Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  {!isReadOnly && <TableHead className="w-20" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pageItems.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium text-zinc-900">
-                      {product.name}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-zinc-500 text-xs font-mono">
-                      {product.barcode ?? '—'}
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell text-zinc-500 text-sm">
-                      {product.category?.name ?? '—'}
-                    </TableCell>
-                    <TableCell className="text-zinc-700 text-sm">
-                      {formatCurrency(product.price / 100)}
-                    </TableCell>
+          <Table className="min-w-160">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-nowrap">Name</TableHead>
+                <TableHead className="whitespace-nowrap">Barcode</TableHead>
+                <TableHead className="whitespace-nowrap">Category</TableHead>
+                <TableHead className="whitespace-nowrap">Price</TableHead>
+                <TableHead className="whitespace-nowrap">Stock</TableHead>
+                {!isReadOnly && <TableHead className="w-20" />}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pageItems.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell className="font-medium text-zinc-900 whitespace-nowrap">
+                    {product.name}
+                  </TableCell>
+                  <TableCell className="text-zinc-500 text-xs font-mono whitespace-nowrap">
+                    {product.barcode ?? '—'}
+                  </TableCell>
+                  <TableCell className="text-zinc-500 text-sm whitespace-nowrap">
+                    {product.category?.name ?? '—'}
+                  </TableCell>
+                  <TableCell className="text-zinc-700 text-sm whitespace-nowrap">
+                    {formatCurrency(product.price / 100)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-zinc-700">{product.stock}</span>
+                      <StockBadge stock={product.stock} lowStockAt={product.lowStockAt} />
+                    </div>
+                  </TableCell>
+                  {!isReadOnly && (
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-zinc-700">{product.stock}</span>
-                        <StockBadge stock={product.stock} lowStockAt={product.lowStockAt} />
+                      <div className="flex items-center gap-1">
+                        <Link
+                          href={`/inventory/${product.id}`}
+                          className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }))}
+                          aria-label="Edit product"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setDeleteId(product.id)}
+                          aria-label="Delete product"
+                          className="text-danger hover:text-danger hover:bg-danger/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
                     </TableCell>
-                    {!isReadOnly && (
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Link
-                            href={`/inventory/${product.id}`}
-                            className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }))}
-                            aria-label="Edit product"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => setDeleteId(product.id)}
-                            aria-label="Delete product"
-                            className="text-danger hover:text-danger hover:bg-danger/10"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
 
         {totalPages > 1 && (

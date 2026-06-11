@@ -151,10 +151,10 @@ export default function PosPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-white shrink-0">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 border-b border-zinc-200 bg-white shrink-0">
+        <div className="min-w-0">
           <h1 className="text-xl font-semibold text-zinc-900">{POS.TITLE}</h1>
-          <p className="text-xs text-zinc-500">
+          <p className="truncate text-xs text-zinc-500">
             {isShiftOpen ? (
               <span className="text-brand font-medium">
                 {POS.SHIFT_OPEN}
@@ -168,7 +168,7 @@ export default function PosPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {!isOnline && <OfflineSaleBanner />}
 
           <Button
