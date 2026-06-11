@@ -15,6 +15,7 @@ import {
 import { PageHeader } from '@/components/shared/PageHeader'
 import { CategoryTable } from '@/components/inventory/CategoryTable'
 import { useCategories, useCreateCategory } from '@/lib/hooks/useCategories'
+import { useUserRole } from '@/lib/hooks/useUserRole'
 import { INVENTORY } from '@/lib/constants/copy'
 
 export default function CategoriesPage() {
@@ -23,6 +24,8 @@ export default function CategoriesPage() {
 
   const { data: categories, isLoading } = useCategories()
   const createMutation = useCreateCategory()
+  const { role } = useUserRole()
+  const isReadOnly = role === 'accountant'
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,20 +42,22 @@ export default function CategoriesPage() {
         title={INVENTORY.CATEGORIES_TITLE}
         description={INVENTORY.CATEGORIES_DESCRIPTION}
         action={
-          <Button
-            onClick={() => setOpen(true)}
-            className="bg-brand hover:bg-brand-dark text-white gap-1.5"
-          >
-            <Plus className="h-4 w-4" />
-            {INVENTORY.NEW_CATEGORY}
-          </Button>
+          !isReadOnly ? (
+            <Button
+              onClick={() => setOpen(true)}
+              className="bg-brand hover:bg-brand-dark text-white gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              {INVENTORY.NEW_CATEGORY}
+            </Button>
+          ) : undefined
         }
       />
 
-      <CategoryTable categories={categories ?? []} isLoading={isLoading} />
+      <CategoryTable categories={categories ?? []} isLoading={isLoading} isReadOnly={isReadOnly} />
 
-      {/* Add dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* Add dialog — hidden for read-only roles */}
+      <Dialog open={!isReadOnly && open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>{INVENTORY.NEW_CATEGORY}</DialogTitle>

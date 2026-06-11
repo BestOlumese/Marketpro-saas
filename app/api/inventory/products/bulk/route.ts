@@ -15,7 +15,7 @@ interface BulkResult {
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<BulkResult>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'inventory_manager'])
     const shopId = await getShopId()
 
     const formData = await req.formData()

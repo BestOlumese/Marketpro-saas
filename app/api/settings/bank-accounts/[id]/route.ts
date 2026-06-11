@@ -10,7 +10,7 @@ interface Params { params: Promise<{ id: string }> }
 
 export async function PATCH(req: NextRequest, { params }: Params): Promise<NextResponse<ApiResponse<BankAccount>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager'])
     const shopId = await getShopId()
     const { id } = await params
 
@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest, { params }: Params): Promise<NextR
 
 export async function DELETE(_req: NextRequest, { params }: Params): Promise<NextResponse<ApiResponse<{ id: string }>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager'])
     const shopId = await getShopId()
     const { id } = await params
 

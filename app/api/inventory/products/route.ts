@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, getShopId } from '@/lib/clerk/helpers'
 import { getProductsByShop, createProduct } from '@/lib/db/queries/products'
+import { checkProductLimit } from '@/lib/db/queries/limits'
 import { productSchema } from '@/lib/validations/product.schema'
+import { logger } from '@/lib/logger'
 import type { ApiResponse, ProductWithRelations } from '@/types'
 import type { Product } from '@/lib/db/schema'
 
 export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<ProductWithRelations[]>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
+    await requireRole(['owner', 'manager', 'accountant', 'inventory_manager', 'cashier'])
     const shopId = await getShopId()
     const search = req.nextUrl.searchParams.get('search') ?? undefined
     const data = await getProductsByShop(shopId, search)
@@ -22,8 +24,21 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Pr
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<Product>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'inventory_manager'])
     const shopId = await getShopId()
+
+    const limit = await checkProductLimit(shopId)
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Product limit reached. Your plan allows ${limit.max} products. Upgrade to add more.`,
+          code: 'PLAN_LIMIT_REACHED',
+        },
+        { status: 403 },
+      )
+    }
+
     const body: unknown = await req.json()
     const parsed = productSchema.safeParse(body)
     if (!parsed.success) {
@@ -38,7 +53,8 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<P
       expiresAt: parsed.data.expiresAt ? new Date(parsed.data.expiresAt) : null,
     })
     return NextResponse.json({ success: true, data: product }, { status: 201 })
-  } catch {
+  } catch (err) {
+    logger.error('POST /api/inventory/products failed', err)
     return NextResponse.json(
       { success: false, error: 'Failed to create product' },
       { status: 500 }

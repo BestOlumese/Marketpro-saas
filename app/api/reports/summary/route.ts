@@ -8,7 +8,7 @@ import type { SalesSummaryItem, DashboardMetrics } from '@/lib/db/queries/report
 
 export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<SalesSummaryItem[] | DashboardMetrics>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'accountant'])
     const shopId = await getShopId()
 
     const { searchParams } = req.nextUrl

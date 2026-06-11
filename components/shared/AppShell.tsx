@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import { useQuery } from '@tanstack/react-query'
+import { useUserRole } from '@/lib/hooks/useUserRole'
+import { UserMenu } from '@/components/shared/UserMenu'
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -16,57 +18,109 @@ import {
   Tag,
   Truck,
   TrendingUp,
+  Clock,
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { OfflineBanner } from '@/components/shared/OfflineBanner'
 import { APP_NAME, NAV } from '@/lib/constants/copy'
 import { ROUTES } from '@/lib/constants/routes'
+import type { ApiResponse, Shift, UserRole } from '@/types'
 
 interface SubNavItem {
   label: string
   href: string
   icon: React.ElementType
+  shiftIndicator?: boolean
 }
 
 interface NavItem {
   label: string
   href: string
   icon: React.ElementType
+  visibleFor: UserRole[]
   children?: SubNavItem[]
 }
 
-const navItems: NavItem[] = [
-  { label: NAV.DASHBOARD, href: ROUTES.DASHBOARD, icon: LayoutDashboard },
-  { label: NAV.POS,       href: ROUTES.POS,       icon: ShoppingCart },
+const ALL_ROLES: UserRole[] = ['owner', 'manager', 'accountant', 'inventory_manager', 'cashier']
+
+const NAV_ITEMS: NavItem[] = [
   {
-    label: NAV.INVENTORY,
-    href: ROUTES.INVENTORY,
-    icon: Package,
+    label: NAV.DASHBOARD, href: ROUTES.DASHBOARD, icon: LayoutDashboard,
+    visibleFor: ALL_ROLES,
+  },
+  {
+    label: NAV.POS, href: ROUTES.POS, icon: ShoppingCart,
+    visibleFor: ['owner', 'manager', 'cashier'],
+  },
+  {
+    label: NAV.INVENTORY, href: ROUTES.INVENTORY, icon: Package,
+    visibleFor: ['owner', 'manager', 'accountant', 'inventory_manager'],
     children: [
       { label: NAV.INVENTORY_CATEGORIES, href: ROUTES.INVENTORY_CATEGORIES, icon: Tag },
       { label: NAV.INVENTORY_SUPPLIERS,  href: ROUTES.INVENTORY_SUPPLIERS,  icon: Truck },
     ],
   },
   {
-    label: NAV.REPORTS,
-    href: ROUTES.REPORTS,
-    icon: BarChart3,
+    label: NAV.REPORTS, href: ROUTES.REPORTS, icon: BarChart3,
+    visibleFor: ['owner', 'manager', 'accountant'],
     children: [
       { label: NAV.REPORTS_PRODUCTS, href: ROUTES.REPORTS_PRODUCTS, icon: TrendingUp },
       { label: NAV.REPORTS_STAFF,    href: ROUTES.REPORTS_STAFF,    icon: Users },
     ],
   },
-  { label: NAV.STAFF,    href: ROUTES.STAFF,    icon: Users },
-  { label: NAV.AI,       href: ROUTES.AI,       icon: Sparkles },
-  { label: NAV.SETTINGS, href: ROUTES.SETTINGS, icon: Settings },
+  {
+    label: NAV.STAFF, href: ROUTES.STAFF, icon: Users,
+    visibleFor: ['owner', 'manager'],
+    children: [
+      { label: NAV.STAFF_SHIFTS, href: ROUTES.STAFF_SHIFTS, icon: Clock, shiftIndicator: true },
+    ],
+  },
+  {
+    label: NAV.AI, href: ROUTES.AI, icon: Sparkles,
+    visibleFor: ['owner', 'manager', 'accountant'],
+  },
+  {
+    label: NAV.SETTINGS, href: ROUTES.SETTINGS, icon: Settings,
+    visibleFor: ALL_ROLES,
+  },
 ]
+
+const RESTRICTED_ROLES: UserRole[] = ['accountant', 'inventory_manager', 'cashier']
+
+function getNavItems(role: UserRole | null): NavItem[] {
+  if (!role) return NAV_ITEMS
+  return NAV_ITEMS
+    .filter((item) => item.visibleFor.includes(role))
+    .map((item) => {
+      // Restricted roles go directly to profile, not the main settings page
+      if (item.href === ROUTES.SETTINGS && RESTRICTED_ROLES.includes(role)) {
+        return { ...item, href: ROUTES.SETTINGS_PROFILE }
+      }
+      return item
+    })
+}
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const { role } = useUserRole()
+
+  const { data: activeShift } = useQuery<Shift | null>({
+    queryKey: ['activeShift'],
+    queryFn: async () => {
+      const res = await fetch('/api/shifts/active')
+      if (!res.ok) return null
+      const json: ApiResponse<Shift | null> = await res.json()
+      return json.success ? json.data : null
+    },
+    refetchInterval: 30_000,
+    staleTime: 20_000,
+  })
+
+  const visibleNav = getNavItems(role)
 
   return (
     <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
-      {navItems.map((item) => {
+      {visibleNav.map((item) => {
         const isActive =
           pathname === item.href ||
           (item.href !== ROUTES.DASHBOARD && pathname.startsWith(item.href + '/')) ||
@@ -104,6 +158,9 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
                     >
                       <child.icon className="h-3.5 w-3.5 shrink-0" />
                       {child.label}
+                      {child.shiftIndicator && activeShift && (
+                        <span className="ml-auto h-2 w-2 rounded-full bg-green-500 shrink-0" />
+                      )}
                     </Link>
                   )
                 })}
@@ -157,7 +214,7 @@ export function AppShell({ children }: AppShellProps) {
           </div>
 
           <div className="ml-auto">
-            <UserButton />
+            <UserMenu />
           </div>
         </header>
 

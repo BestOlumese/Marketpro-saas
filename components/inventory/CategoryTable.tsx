@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Trash2, Tag } from 'lucide-react'
+import Papa from 'papaparse'
+import { Pencil, Trash2, Tag, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,9 +31,22 @@ const PAGE_SIZE = 10
 interface CategoryTableProps {
   categories: Category[]
   isLoading: boolean
+  isReadOnly?: boolean
 }
 
-export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
+function exportCategoriesCsv(categories: Category[]) {
+  const rows = categories.map((c) => ({
+    Name:       c.name,
+    'Created At': new Date(c.createdAt).toLocaleDateString(),
+  }))
+  const csv = Papa.unparse(rows)
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }))
+  const a = document.createElement('a')
+  a.href = url; a.download = 'categories.csv'; a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function CategoryTable({ categories, isLoading, isReadOnly = false }: CategoryTableProps) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [editCategory, setEditCategory] = useState<Category | null>(null)
@@ -89,13 +103,23 @@ export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
   return (
     <>
       <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-zinc-100">
+        <div className="flex items-center gap-3 p-4 border-b border-zinc-100">
           <Input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
             placeholder={INVENTORY.SEARCH_CATEGORIES}
             className="max-w-sm"
           />
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto gap-1.5"
+            onClick={() => exportCategoriesCsv(filtered)}
+            disabled={filtered.length === 0}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {INVENTORY.EXPORT_CSV}
+          </Button>
         </div>
 
         {pageItems.length === 0 ? (
@@ -112,7 +136,7 @@ export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead className="hidden sm:table-cell">Created</TableHead>
-                  <TableHead className="w-20" />
+                  {!isReadOnly && <TableHead className="w-20" />}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -122,27 +146,29 @@ export function CategoryTable({ categories, isLoading }: CategoryTableProps) {
                     <TableCell className="hidden sm:table-cell text-zinc-500 text-sm">
                       {new Date(cat.createdAt).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => openEdit(cat)}
-                          aria-label={`Edit ${cat.name}`}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setDeleteId(cat.id)}
-                          aria-label={`Delete ${cat.name}`}
-                          className="text-danger hover:text-danger hover:bg-danger/10"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {!isReadOnly && (
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEdit(cat)}
+                            aria-label={`Edit ${cat.name}`}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => setDeleteId(cat.id)}
+                            aria-label={`Delete ${cat.name}`}
+                            className="text-danger hover:text-danger hover:bg-danger/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

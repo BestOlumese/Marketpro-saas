@@ -8,7 +8,8 @@ export const logger = {
     if (isDev) console.warn(`[WARN] ${message}`, data ?? '')
   },
   error: (message: string, error?: unknown) => {
-    if (isDev) console.error(`[ERROR] ${message}`, error ?? '')
+    // Always log errors — not just in dev
+    console.error(`[ERROR] ${message}`, error ?? '')
   },
   debug: (message: string, data?: unknown) => {
     if (isDev) console.debug(`[DEBUG] ${message}`, data ?? '')

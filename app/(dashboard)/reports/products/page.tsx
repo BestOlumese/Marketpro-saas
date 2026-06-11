@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { DateRangePicker } from '@/components/reports/DateRangePicker'
 import { TopProductsTable } from '@/components/reports/TopProductsTable'
 import { ExportButton } from '@/components/reports/ExportButton'
+import { PlanGate } from '@/components/shared/PlanGate'
 import { useTopProducts } from '@/lib/hooks/useReports'
 import { REPORTS } from '@/lib/constants/copy'
 
@@ -16,7 +17,7 @@ function defaultRange() {
   return { from: toISO(start), to: toISO(now) }
 }
 
-export default function TopProductsPage() {
+function TopProductsContent() {
   const [{ from, to }, setRange] = useState(defaultRange)
   const { data = [], isLoading } = useTopProducts(from, to, 20)
 
@@ -33,5 +34,13 @@ export default function TopProductsPage() {
         <TopProductsTable data={data} isLoading={isLoading} />
       </div>
     </div>
+  )
+}
+
+export default function TopProductsPage() {
+  return (
+    <PlanGate requiredPlan="growth" description="Top Products report is available on the Growth plan and above.">
+      <TopProductsContent />
+    </PlanGate>
   )
 }

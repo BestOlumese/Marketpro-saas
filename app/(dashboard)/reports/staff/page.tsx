@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { DateRangePicker } from '@/components/reports/DateRangePicker'
 import { StaffLeaderboard } from '@/components/reports/StaffLeaderboard'
 import { ExportButton } from '@/components/reports/ExportButton'
+import { PlanGate } from '@/components/shared/PlanGate'
 import { useStaffPerformance } from '@/lib/hooks/useReports'
 import { REPORTS } from '@/lib/constants/copy'
 
@@ -16,7 +17,7 @@ function defaultRange() {
   return { from: toISO(start), to: toISO(now) }
 }
 
-export default function StaffReportPage() {
+function StaffReportContent() {
   const [{ from, to }, setRange] = useState(defaultRange)
   const { data = [], isLoading } = useStaffPerformance(from, to)
 
@@ -33,5 +34,13 @@ export default function StaffReportPage() {
         <StaffLeaderboard data={data} isLoading={isLoading} />
       </div>
     </div>
+  )
+}
+
+export default function StaffReportPage() {
+  return (
+    <PlanGate requiredPlan="growth" description="Staff Performance report is available on the Growth plan and above.">
+      <StaffReportContent />
+    </PlanGate>
   )
 }

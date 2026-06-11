@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Trash2, Building2 } from 'lucide-react'
+import Papa from 'papaparse'
+import { Pencil, Trash2, Building2, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,9 +39,24 @@ interface SupplierFormState {
 interface SupplierTableProps {
   suppliers: Supplier[]
   isLoading: boolean
+  isReadOnly?: boolean
 }
 
-export function SupplierTable({ suppliers, isLoading }: SupplierTableProps) {
+function exportSuppliersCsv(suppliers: Supplier[]) {
+  const rows = suppliers.map((s) => ({
+    Name:  s.name,
+    Phone: s.phone ?? '',
+    Email: s.email ?? '',
+    Notes: s.notes ?? '',
+  }))
+  const csv = Papa.unparse(rows)
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }))
+  const a = document.createElement('a')
+  a.href = url; a.download = 'suppliers.csv'; a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function SupplierTable({ suppliers, isLoading, isReadOnly = false }: SupplierTableProps) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [editSupplier, setEditSupplier] = useState<Supplier | null>(null)
@@ -119,13 +135,23 @@ export function SupplierTable({ suppliers, isLoading }: SupplierTableProps) {
   return (
     <>
       <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-zinc-100">
+        <div className="flex items-center gap-3 p-4 border-b border-zinc-100">
           <Input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
             placeholder={INVENTORY.SEARCH_SUPPLIERS}
             className="max-w-sm"
           />
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto gap-1.5"
+            onClick={() => exportSuppliersCsv(filtered)}
+            disabled={filtered.length === 0}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {INVENTORY.EXPORT_CSV}
+          </Button>
         </div>
 
         {pageItems.length === 0 ? (
@@ -144,7 +170,7 @@ export function SupplierTable({ suppliers, isLoading }: SupplierTableProps) {
                   <TableHead className="hidden md:table-cell">Phone</TableHead>
                   <TableHead className="hidden md:table-cell">Email</TableHead>
                   <TableHead className="hidden lg:table-cell">Notes</TableHead>
-                  <TableHead className="w-20" />
+                  {!isReadOnly && <TableHead className="w-20" />}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -165,27 +191,29 @@ export function SupplierTable({ suppliers, isLoading }: SupplierTableProps) {
                     <TableCell className="hidden lg:table-cell text-zinc-500 text-sm max-w-xs truncate">
                       {s.notes ?? '—'}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => openEdit(s)}
-                          aria-label={`Edit ${s.name}`}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setDeleteId(s.id)}
-                          aria-label={`Delete ${s.name}`}
-                          className="text-danger hover:text-danger hover:bg-danger/10"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {!isReadOnly && (
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEdit(s)}
+                            aria-label={`Edit ${s.name}`}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => setDeleteId(s.id)}
+                            aria-label={`Delete ${s.name}`}
+                            className="text-danger hover:text-danger hover:bg-danger/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { sales, saleItems, products } from '@/lib/db/schema'
-import { eq, and, desc, gte, lte, sql } from 'drizzle-orm'
+import { eq, and, desc, gte, lte, sql, inArray } from 'drizzle-orm'
 import type { NewSaleItem } from '@/lib/db/schema'
 
 interface CreateSaleItem {
@@ -70,9 +70,19 @@ export async function createSale(
 
   if (!sale) throw new Error('Failed to insert sale')
 
+  // Verify which product IDs still exist in the DB.
+  // Products deleted server-side may still be in the client's local cache.
+  // For deleted products: keep the name/price snapshot but set productId = null.
+  const productIds = input.items.map((i) => i.productId)
+  const existingRows = await db
+    .select({ id: products.id })
+    .from(products)
+    .where(inArray(products.id, productIds))
+  const existingIds = new Set(existingRows.map((r) => r.id))
+
   const itemRows: NewSaleItem[] = input.items.map((item) => ({
     saleId: sale.id,
-    productId: item.productId,
+    productId: existingIds.has(item.productId) ? item.productId : null,
     name: item.name,
     price: item.price,
     quantity: item.quantity,
@@ -81,14 +91,16 @@ export async function createSale(
 
   const insertedItems = await db.insert(saleItems).values(itemRows).returning()
 
-  // Decrement stock for each product
+  // Decrement stock only for products that still exist
   await Promise.all(
-    input.items.map((item) =>
-      db
-        .update(products)
-        .set({ stock: sql`${products.stock} - ${item.quantity}` })
-        .where(and(eq(products.id, item.productId), eq(products.shopId, shopId)))
-    )
+    input.items
+      .filter((item) => existingIds.has(item.productId))
+      .map((item) =>
+        db
+          .update(products)
+          .set({ stock: sql`${products.stock} - ${item.quantity}` })
+          .where(and(eq(products.id, item.productId), eq(products.shopId, shopId)))
+      )
   )
 
   return { ...sale, items: insertedItems }

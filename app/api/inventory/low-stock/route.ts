@@ -6,7 +6,7 @@ import type { Product } from '@/lib/db/schema'
 
 export async function GET(): Promise<NextResponse<ApiResponse<Product[]>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
+    await requireRole(['owner', 'manager', 'accountant', 'inventory_manager'])
     const shopId = await getShopId()
     const data = await getLowStockProducts(shopId)
     return NextResponse.json({ success: true, data: data as Product[] })
