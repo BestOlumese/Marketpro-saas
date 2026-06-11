@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from '@/components/ui/sonner'
 import { QueryProvider } from '@/components/shared/QueryProvider'
 import { APP_NAME, APP_TAGLINE } from '@/lib/constants/copy'
@@ -15,17 +14,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
-      allowedRedirectOrigins={['http://localhost:3000', process.env.NEXT_PUBLIC_APP_URL].filter((v): v is string => !!v)}
-    >
-      <html lang="en" className={`${inter.variable} h-full scroll-smooth antialiased`}>
-        <body className="min-h-full bg-zinc-50 text-zinc-900">
-          <QueryProvider>
-            {children}
-          </QueryProvider>
-          <Toaster richColors position="top-right" />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={`${inter.variable} h-full scroll-smooth antialiased`}>
+      <body className="min-h-full bg-zinc-50 text-zinc-900">
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+        <Toaster richColors position="top-right" />
+      </body>
+    </html>
   )
 }

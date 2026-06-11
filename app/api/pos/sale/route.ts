@@ -1,27 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireRole, getShopId, getStaffId } from '@/lib/clerk/helpers'
+import { getAuthContext } from '@/lib/clerk/helpers'
 import { createSale } from '@/lib/db/queries/sales'
 import { createSaleSchema } from '@/lib/validations/sale.schema'
+import { logger } from '@/lib/logger'
 import type { ApiResponse } from '@/types'
 import type { SaleWithItems } from '@/lib/db/queries/sales'
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<SaleWithItems>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
-    const shopId  = await getShopId()
-    const staffId = await getStaffId()
+    const ctx = await getAuthContext()
 
     const body: unknown = await req.json()
     const parsed = createSaleSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: parsed.error.issues[0]?.message ?? 'Validation error' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
-    const sale = await createSale(shopId, {
-      staffId,
+    const sale = await createSale(ctx.shopId, {
+      staffId:       ctx.staffId,
       customerId:    parsed.data.customerId ?? null,
       paymentMethod: parsed.data.paymentMethod,
       discount:      parsed.data.discount,
@@ -30,10 +29,19 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<S
     })
 
     return NextResponse.json({ success: true, data: sale }, { status: 201 })
-  } catch {
+  } catch (err) {
+    if (err instanceof Error) {
+      if (err.message === 'UNAUTHORIZED' || err.message === 'UNAUTHORISED') {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      }
+      if (err.message === 'SHOP_NOT_FOUND') {
+        return NextResponse.json({ success: false, error: 'Shop not found' }, { status: 404 })
+      }
+    }
+    logger.error('POST /api/pos/sale failed', err)
     return NextResponse.json(
       { success: false, error: 'Failed to process sale' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

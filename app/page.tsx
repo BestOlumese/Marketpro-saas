@@ -1,13 +1,12 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
-import { useAuth } from '@clerk/nextjs'
-import { Menu, X, Check, ShoppingCart, Package, BarChart3, Users, Wifi, Sparkles } from 'lucide-react'
+import { Check, ShoppingCart, Package, BarChart3, Users, Wifi, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { AuthNavDesktop, AuthNavMobile } from '@/components/auth/AuthNav'
+import { MobileMenu } from '@/components/shared/MobileMenu'
+import { AppScreenshot } from '@/components/shared/AppScreenshot'
+import { ProductPreview } from '@/components/shared/ProductPreview'
 import {
   APP_NAME,
   LANDING,
@@ -27,12 +26,6 @@ const NAV_LINKS = [
 ]
 
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { isSignedIn, isLoaded } = useAuth()
-
-  const primaryHref = isSignedIn ? ROUTES.DASHBOARD : ROUTES.SIGN_UP
-  const primaryLabel = isSignedIn ? LANDING.CTA_DASHBOARD : LANDING.HERO_CTA_PRIMARY
-
   return (
     <div className="min-h-screen bg-white text-zinc-900">
 
@@ -56,87 +49,14 @@ export default function LandingPage() {
               ))}
             </div>
 
-            {/* Desktop CTA — auth-aware */}
-            {isLoaded && (
-              <div className="hidden md:flex items-center gap-3">
-                {isSignedIn ? (
-                  <Link
-                    href={ROUTES.DASHBOARD}
-                    className={cn(buttonVariants(), 'bg-brand hover:bg-brand-dark text-white')}
-                  >
-                    {LANDING.CTA_DASHBOARD}
-                  </Link>
-                ) : (
-                  <>
-                    <Link href={ROUTES.SIGN_IN} className={buttonVariants({ variant: 'ghost' })}>
-                      Sign in
-                    </Link>
-                    <Link
-                      href={ROUTES.SIGN_UP}
-                      className={cn(buttonVariants(), 'bg-brand hover:bg-brand-dark text-white')}
-                    >
-                      Get started
-                    </Link>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Mobile menu toggle */}
-            <button
-              className="md:hidden rounded-md p-2 text-zinc-600 hover:bg-zinc-100 transition-colors"
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-
-          {/* Mobile menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-zinc-100 py-4 space-y-1">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="block rounded-md px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ))}
-              {isLoaded && (
-                <>
-                  <Separator className="my-3" />
-                  <div className="flex gap-2 px-4">
-                    {isSignedIn ? (
-                      <Link
-                        href={ROUTES.DASHBOARD}
-                        className={cn(buttonVariants(), 'flex-1 bg-brand hover:bg-brand-dark text-white')}
-                      >
-                        {LANDING.CTA_DASHBOARD}
-                      </Link>
-                    ) : (
-                      <>
-                        <Link
-                          href={ROUTES.SIGN_IN}
-                          className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}
-                        >
-                          Sign in
-                        </Link>
-                        <Link
-                          href={ROUTES.SIGN_UP}
-                          className={cn(buttonVariants(), 'flex-1 bg-brand hover:bg-brand-dark text-white')}
-                        >
-                          Get started
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                </>
-              )}
+            {/* Desktop auth CTA — client-only */}
+            <div className="hidden md:flex">
+              <AuthNavDesktop />
             </div>
-          )}
+
+            {/* Mobile menu toggle — client-only */}
+            <MobileMenu navLinks={NAV_LINKS} />
+          </div>
         </div>
       </nav>
 
@@ -154,10 +74,10 @@ export default function LandingPage() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href={primaryHref}
+              href={ROUTES.SIGN_UP}
               className={cn(buttonVariants({ size: 'lg' }), 'bg-brand hover:bg-brand-dark text-white px-8')}
             >
-              {primaryLabel}
+              {LANDING.HERO_CTA_PRIMARY}
             </Link>
             <a
               href="#features"
@@ -167,6 +87,23 @@ export default function LandingPage() {
             </a>
           </div>
         </div>
+      </section>
+
+      {/* ── Hero Screenshot ── */}
+      <section className="relative bg-white px-4 pb-0 sm:px-6 lg:px-8">
+        {/* Top gradient fade from hero */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white to-transparent" />
+        <div className="mx-auto max-w-5xl">
+          <AppScreenshot
+            src="/screenshots/screenshot-dashboard.png"
+            alt="MarketPro dashboard — revenue overview, top products, and real-time sales chart"
+            url="app.marketpro.ng/dashboard"
+            priority
+            className="shadow-[0_32px_80px_-12px_rgba(0,0,0,0.18)]"
+          />
+        </div>
+        {/* Bottom gradient fade into features */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-zinc-50 to-transparent" />
       </section>
 
       {/* ── Features ── */}
@@ -193,6 +130,17 @@ export default function LandingPage() {
               )
             })}
           </div>
+        </div>
+      </section>
+
+      {/* ── Product Preview ── */}
+      <section className="bg-white px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-zinc-900">{LANDING.PREVIEW_TITLE}</h2>
+            <p className="mt-3 text-zinc-500">{LANDING.PREVIEW_SUBTITLE}</p>
+          </div>
+          <ProductPreview />
         </div>
       </section>
 
@@ -238,7 +186,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link
-                  href={isSignedIn ? ROUTES.DASHBOARD : ROUTES.SIGN_UP}
+                  href={ROUTES.SIGN_UP}
                   className={cn(
                     buttonVariants(),
                     'w-full',
@@ -247,7 +195,7 @@ export default function LandingPage() {
                       : 'bg-brand hover:bg-brand-dark text-white'
                   )}
                 >
-                  {isSignedIn ? LANDING.CTA_DASHBOARD : plan.cta}
+                  {plan.cta}
                 </Link>
               </div>
             ))}

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Pencil, Trash2, Package } from 'lucide-react'
+import Papa from 'papaparse'
+import { Pencil, Trash2, Package, Download } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Button } from '@/components/ui/button'
@@ -35,9 +36,28 @@ interface ProductTableProps {
   products: ProductWithRelations[]
   isLoading: boolean
   search?: string
+  isReadOnly?: boolean
 }
 
-export function ProductTable({ products, isLoading, search }: ProductTableProps) {
+function exportProductsCsv(products: ProductWithRelations[]) {
+  const rows = products.map((p) => ({
+    Name:            p.name,
+    Barcode:         p.barcode ?? '',
+    Category:        p.category?.name ?? '',
+    Supplier:        p.supplier?.name ?? '',
+    'Price (₦)':     (p.price / 100).toFixed(2),
+    'Cost Price (₦)': p.costPrice != null ? (p.costPrice / 100).toFixed(2) : '',
+    Stock:           p.stock,
+    'Low Stock At':  p.lowStockAt ?? '',
+  }))
+  const csv = Papa.unparse(rows)
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }))
+  const a = document.createElement('a')
+  a.href = url; a.download = 'products.csv'; a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function ProductTable({ products, isLoading, search, isReadOnly = false }: ProductTableProps) {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [page, setPage] = useState(1)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -88,7 +108,7 @@ export function ProductTable({ products, isLoading, search }: ProductTableProps)
     <>
       <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 p-4 border-b border-zinc-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border-b border-zinc-100">
           <select
             value={categoryFilter}
             onChange={(e) => { setCategoryFilter(e.target.value); setPage(1) }}
@@ -99,6 +119,16 @@ export function ProductTable({ products, isLoading, search }: ProductTableProps)
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto gap-1.5"
+            onClick={() => exportProductsCsv(filtered)}
+            disabled={filtered.length === 0}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {INVENTORY.EXPORT_CSV}
+          </Button>
         </div>
 
         {pageItems.length === 0 ? (
@@ -117,7 +147,7 @@ export function ProductTable({ products, isLoading, search }: ProductTableProps)
                   <TableHead className="hidden sm:table-cell">Category</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Stock</TableHead>
-                  <TableHead className="w-20" />
+                  {!isReadOnly && <TableHead className="w-20" />}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -141,26 +171,28 @@ export function ProductTable({ products, isLoading, search }: ProductTableProps)
                         <StockBadge stock={product.stock} lowStockAt={product.lowStockAt} />
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Link
-                          href={`/inventory/${product.id}`}
-                          className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }))}
-                          aria-label="Edit product"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setDeleteId(product.id)}
-                          aria-label="Delete product"
-                          className="text-danger hover:text-danger hover:bg-danger/10"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {!isReadOnly && (
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Link
+                            href={`/inventory/${product.id}`}
+                            className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }))}
+                            aria-label="Edit product"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => setDeleteId(product.id)}
+                            aria-label="Delete product"
+                            className="text-danger hover:text-danger hover:bg-danger/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

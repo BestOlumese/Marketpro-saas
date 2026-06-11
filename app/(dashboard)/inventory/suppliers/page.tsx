@@ -16,6 +16,7 @@ import {
 import { PageHeader } from '@/components/shared/PageHeader'
 import { SupplierTable } from '@/components/inventory/SupplierTable'
 import { useSuppliers, useCreateSupplier } from '@/lib/hooks/useSuppliers'
+import { useUserRole } from '@/lib/hooks/useUserRole'
 import { INVENTORY } from '@/lib/constants/copy'
 
 interface SupplierFormState {
@@ -33,6 +34,8 @@ export default function SuppliersPage() {
 
   const { data: suppliers, isLoading } = useSuppliers()
   const createMutation = useCreateSupplier()
+  const { role } = useUserRole()
+  const isReadOnly = role === 'accountant'
 
   function set(field: keyof SupplierFormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -60,20 +63,22 @@ export default function SuppliersPage() {
         title={INVENTORY.SUPPLIERS_TITLE}
         description={INVENTORY.SUPPLIERS_DESCRIPTION}
         action={
-          <Button
-            onClick={() => setOpen(true)}
-            className="bg-brand hover:bg-brand-dark text-white gap-1.5"
-          >
-            <Plus className="h-4 w-4" />
-            {INVENTORY.NEW_SUPPLIER}
-          </Button>
+          !isReadOnly ? (
+            <Button
+              onClick={() => setOpen(true)}
+              className="bg-brand hover:bg-brand-dark text-white gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              {INVENTORY.NEW_SUPPLIER}
+            </Button>
+          ) : undefined
         }
       />
 
-      <SupplierTable suppliers={suppliers ?? []} isLoading={isLoading} />
+      <SupplierTable suppliers={suppliers ?? []} isLoading={isLoading} isReadOnly={isReadOnly} />
 
-      {/* Add dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* Add dialog — hidden for read-only roles */}
+      <Dialog open={!isReadOnly && open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{INVENTORY.NEW_SUPPLIER}</DialogTitle>

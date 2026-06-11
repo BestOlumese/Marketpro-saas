@@ -6,7 +6,7 @@ import type { ApiResponse } from '@/types'
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<{ saleId: string }>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager'])
     const shopId = await getShopId()
 
     const body: unknown = await req.json()

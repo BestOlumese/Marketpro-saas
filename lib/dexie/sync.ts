@@ -30,6 +30,12 @@ export async function syncProductsToLocal(): Promise<void> {
       categoryId: p.categoryId,
     }))
 
+    // Delete products no longer on the server (deleted/soft-deleted since last sync)
+    const serverIds  = new Set(products.map((p) => p.id))
+    const localKeys  = await localDb.products.toCollection().primaryKeys() as string[]
+    const staleIds   = localKeys.filter((id) => !serverIds.has(id))
+    if (staleIds.length > 0) await localDb.products.bulkDelete(staleIds)
+
     await localDb.products.bulkPut(products)
   } catch {
     // silently fail — offline or not authenticated yet

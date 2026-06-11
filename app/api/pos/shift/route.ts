@@ -15,7 +15,7 @@ interface ShiftResult {
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<ShiftResult>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
+    await requireRole(['owner', 'manager', 'cashier'])
 
     const body: unknown = await req.json()
     const parsed = shiftSchema.safeParse(body)

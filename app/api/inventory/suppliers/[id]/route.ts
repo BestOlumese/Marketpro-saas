@@ -13,7 +13,7 @@ export async function PATCH(
   { params }: RouteParams
 ): Promise<NextResponse<ApiResponse<Supplier>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'inventory_manager'])
     const shopId = await getShopId()
     const { id } = await params
     const body: unknown = await req.json()
@@ -39,7 +39,7 @@ export async function DELETE(
   { params }: RouteParams
 ): Promise<NextResponse<ApiResponse<Supplier>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'inventory_manager'])
     const shopId = await getShopId()
     const { id } = await params
     const supplier = await deleteSupplier(shopId, id)

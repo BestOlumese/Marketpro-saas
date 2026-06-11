@@ -7,7 +7,7 @@ import type { Supplier } from '@/lib/db/schema'
 
 export async function GET(): Promise<NextResponse<ApiResponse<Supplier[]>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
+    await requireRole(['owner', 'manager', 'accountant', 'inventory_manager'])
     const shopId = await getShopId()
     const data = await getSuppliersByShop(shopId)
     return NextResponse.json({ success: true, data })
@@ -21,7 +21,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<Supplier[]>>> {
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<Supplier>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'inventory_manager'])
     const shopId = await getShopId()
     const body: unknown = await req.json()
     const parsed = supplierSchema.safeParse(body)

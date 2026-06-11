@@ -8,7 +8,7 @@ import type { BankAccount } from '@/lib/db/schema'
 
 export async function GET(): Promise<NextResponse<ApiResponse<BankAccount[]>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
+    await requireRole(['owner', 'manager', 'cashier'])
     const shopId = await getShopId()
     const accounts = await getBankAccounts(shopId)
     return NextResponse.json({ success: true, data: accounts })
@@ -24,7 +24,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<BankAccount[]>>> {
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<BankAccount>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager'])
     const shopId = await getShopId()
 
     const body: unknown = await req.json()

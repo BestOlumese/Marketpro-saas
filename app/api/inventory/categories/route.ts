@@ -7,7 +7,7 @@ import type { Category } from '@/lib/db/schema'
 
 export async function GET(): Promise<NextResponse<ApiResponse<Category[]>>> {
   try {
-    await requireRole(['org:admin', 'org:manager', 'org:cashier'])
+    await requireRole(['owner', 'manager', 'accountant', 'inventory_manager', 'cashier'])
     const shopId = await getShopId()
     const data = await getCategoriesByShop(shopId)
     return NextResponse.json({ success: true, data })
@@ -21,7 +21,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<Category[]>>> {
 
 export async function POST(req: NextRequest): Promise<NextResponse<ApiResponse<Category>>> {
   try {
-    await requireRole(['org:admin', 'org:manager'])
+    await requireRole(['owner', 'manager', 'inventory_manager'])
     const shopId = await getShopId()
     const body: unknown = await req.json()
     const parsed = categorySchema.safeParse(body)
