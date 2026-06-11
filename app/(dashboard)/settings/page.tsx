@@ -6,7 +6,7 @@ import { SETTINGS, BILLING } from '@/lib/constants/copy'
 
 export default function SettingsPage() {
   return (
-    <div className="p-6 space-y-10">
+    <div className="p-4 sm:p-6 space-y-10">
       <PageHeader title={SETTINGS.TITLE} description={SETTINGS.DESCRIPTION} />
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6">
@@ -14,14 +14,14 @@ export default function SettingsPage() {
       </div>
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h3 className="font-semibold text-zinc-900">Team</h3>
             <p className="mt-0.5 text-sm text-zinc-500">Manage staff accounts and roles.</p>
           </div>
           <Link
             href="/settings/team"
-            className="flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-200 transition-colors"
+            className="self-start sm:self-auto flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-200 transition-colors"
           >
             <Users className="h-4 w-4" />
             Manage team
@@ -30,14 +30,14 @@ export default function SettingsPage() {
       </div>
 
       <div className="rounded-lg border border-brand/20 bg-brand-light p-6">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h3 className="font-semibold text-brand">{BILLING.TITLE}</h3>
             <p className="mt-0.5 text-sm text-zinc-500">{BILLING.DESCRIPTION}</p>
           </div>
           <Link
             href="/settings/billing"
-            className="flex items-center gap-2 rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark transition-colors"
+            className="self-start sm:self-auto flex items-center gap-2 rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark transition-colors"
           >
             <CreditCard className="h-4 w-4" />
             Manage billing

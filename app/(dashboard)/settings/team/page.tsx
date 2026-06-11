@@ -11,7 +11,7 @@ export default async function TeamPage() {
   if (!session?.user) redirect(ROUTES.SIGN_IN)
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader title={TEAM.TITLE} description={TEAM.DESCRIPTION} />
       <div className="mt-6">
         <TeamSettings currentUserId={session.user.id} />

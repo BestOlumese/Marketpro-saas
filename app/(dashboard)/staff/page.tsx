@@ -24,8 +24,8 @@ export default async function StaffPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-4 lg:p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-xl font-semibold text-zinc-900">{STAFF.TITLE}</h1>
           <p className="mt-0.5 text-sm text-zinc-500">{STAFF.DESCRIPTION}</p>
         </div>

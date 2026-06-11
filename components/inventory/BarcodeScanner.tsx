@@ -85,11 +85,10 @@ export function BarcodeScanner({ value, onChange }: BarcodeScannerProps) {
           </Button>
         )}
       </div>
-      {scanning && (
-        <div className="rounded-lg overflow-hidden border border-zinc-200 bg-black aspect-video w-full max-w-sm">
-          <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
-        </div>
-      )}
+      {/* Video element always in DOM so videoRef is available when startScan runs */}
+      <div className={`rounded-lg overflow-hidden border border-zinc-200 bg-black aspect-video w-full max-w-sm ${scanning ? '' : 'hidden'}`}>
+        <video ref={videoRef} className="w-full h-full object-cover" muted playsInline autoPlay />
+      </div>
     </div>
   )
 }

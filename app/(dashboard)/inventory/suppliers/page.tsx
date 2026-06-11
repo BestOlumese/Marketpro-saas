@@ -58,7 +58,7 @@ export default function SuppliersPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title={INVENTORY.SUPPLIERS_TITLE}
         description={INVENTORY.SUPPLIERS_DESCRIPTION}

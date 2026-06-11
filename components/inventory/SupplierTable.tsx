@@ -134,7 +134,7 @@ export function SupplierTable({ suppliers, isLoading, isReadOnly = false }: Supp
 
   return (
     <>
-      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
         <div className="flex items-center gap-3 p-4 border-b border-zinc-100">
           <Input
             value={search}
@@ -162,63 +162,58 @@ export function SupplierTable({ suppliers, isLoading, isReadOnly = false }: Supp
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">Phone</TableHead>
-                  <TableHead className="hidden md:table-cell">Email</TableHead>
-                  <TableHead className="hidden lg:table-cell">Notes</TableHead>
-                  {!isReadOnly && <TableHead className="w-20" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pageItems.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-medium text-zinc-900">
-                      {s.name}
-                      <div className="md:hidden text-xs text-zinc-500 mt-0.5">
-                        {[s.phone, s.email].filter(Boolean).join(' · ') || 'No contact info'}
+          <Table className="min-w-175">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-nowrap">Name</TableHead>
+                <TableHead className="whitespace-nowrap">Phone</TableHead>
+                <TableHead className="whitespace-nowrap">Email</TableHead>
+                <TableHead className="whitespace-nowrap">Notes</TableHead>
+                {!isReadOnly && <TableHead className="w-20" />}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pageItems.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell className="font-medium text-zinc-900 whitespace-nowrap">
+                    {s.name}
+                  </TableCell>
+                  <TableCell className="text-zinc-500 text-sm whitespace-nowrap">
+                    {s.phone ?? '—'}
+                  </TableCell>
+                  <TableCell className="text-zinc-500 text-sm whitespace-nowrap">
+                    {s.email ?? '—'}
+                  </TableCell>
+                  <TableCell className="text-zinc-500 text-sm max-w-48 truncate">
+                    {s.notes ?? '—'}
+                  </TableCell>
+                  {!isReadOnly && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => openEdit(s)}
+                          aria-label={`Edit ${s.name}`}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setDeleteId(s.id)}
+                          aria-label={`Delete ${s.name}`}
+                          className="text-danger hover:text-danger hover:bg-danger/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-zinc-500 text-sm">
-                      {s.phone ?? '—'}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-zinc-500 text-sm">
-                      {s.email ?? '—'}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-zinc-500 text-sm max-w-xs truncate">
-                      {s.notes ?? '—'}
-                    </TableCell>
-                    {!isReadOnly && (
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => openEdit(s)}
-                            aria-label={`Edit ${s.name}`}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => setDeleteId(s.id)}
-                            aria-label={`Delete ${s.name}`}
-                            className="text-danger hover:text-danger hover:bg-danger/10"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
 
         {totalPages > 1 && (

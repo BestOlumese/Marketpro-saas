@@ -231,7 +231,7 @@ export function TeamSettings({ currentUserId }: { currentUserId: string }) {
         </form>
       )}
 
-      <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden">
+      <div className="rounded-lg border border-zinc-200 bg-white overflow-x-auto">
         {isLoading && (
           <div className="divide-y divide-zinc-100">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -248,12 +248,12 @@ export function TeamSettings({ currentUserId }: { currentUserId: string }) {
           <div className="py-10 text-center text-sm text-zinc-400">{TEAM.EMPTY}</div>
         )}
         {!isLoading && members.length > 0 && (
-          <table className="w-full text-sm">
+          <table className="w-full min-w-145 text-sm">
             <thead className="border-b border-zinc-100 bg-zinc-50">
               <tr>
-                <th className="px-4 py-2.5 text-left font-medium text-zinc-500">Name</th>
-                <th className="px-4 py-2.5 text-left font-medium text-zinc-500">Email</th>
-                <th className="px-4 py-2.5 text-left font-medium text-zinc-500">Role</th>
+                <th className="px-4 py-2.5 text-left font-medium text-zinc-500 whitespace-nowrap">Name</th>
+                <th className="px-4 py-2.5 text-left font-medium text-zinc-500 whitespace-nowrap">Email</th>
+                <th className="px-4 py-2.5 text-left font-medium text-zinc-500 whitespace-nowrap">Role</th>
                 <th className="px-4 py-2.5" />
               </tr>
             </thead>
@@ -336,7 +336,7 @@ export function TeamSettings({ currentUserId }: { currentUserId: string }) {
             <Clock className="h-4 w-4 text-zinc-400" />
             <h3 className="text-sm font-medium text-zinc-700">Pending invitations</h3>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden">
+          <div className="rounded-lg border border-zinc-200 bg-white overflow-x-auto">
             {invitesLoading ? (
               <div className="divide-y divide-zinc-100">
                 {Array.from({ length: 2 }).map((_, i) => (
@@ -348,12 +348,12 @@ export function TeamSettings({ currentUserId }: { currentUserId: string }) {
                 ))}
               </div>
             ) : (
-              <table className="w-full text-sm">
+              <table className="w-full min-w-135 text-sm">
                 <thead className="border-b border-zinc-100 bg-zinc-50">
                   <tr>
-                    <th className="px-4 py-2.5 text-left font-medium text-zinc-500">Email</th>
-                    <th className="px-4 py-2.5 text-left font-medium text-zinc-500">Role</th>
-                    <th className="px-4 py-2.5 text-left font-medium text-zinc-500">Sent</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-zinc-500 whitespace-nowrap">Email</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-zinc-500 whitespace-nowrap">Role</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-zinc-500 whitespace-nowrap">Sent</th>
                     <th className="px-4 py-2.5" />
                   </tr>
                 </thead>

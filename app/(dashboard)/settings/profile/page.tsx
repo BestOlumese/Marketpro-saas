@@ -11,7 +11,7 @@ export default async function ProfilePage() {
   if (!session?.user) redirect(ROUTES.SIGN_IN)
 
   return (
-    <div className="p-6 space-y-6 max-w-lg">
+    <div className="p-4 sm:p-6 space-y-6 max-w-lg">
       <PageHeader title="Account settings" description="Update your name and password." />
 
       {/* Personal info card */}

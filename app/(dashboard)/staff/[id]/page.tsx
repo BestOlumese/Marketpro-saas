@@ -63,17 +63,17 @@ export default async function StaffDetailPage({ params }: StaffDetailPageProps) 
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 text-center">
-          <p className="text-2xl font-semibold text-zinc-900">{completedSales.length}</p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="rounded-lg border border-zinc-200 bg-white p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-semibold text-zinc-900">{completedSales.length}</p>
           <p className="text-xs text-zinc-500">{STAFF.SALES_COUNT}</p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 text-center">
-          <p className="text-lg font-semibold text-zinc-900">{formatCurrency(totalRevenue)}</p>
+        <div className="rounded-lg border border-zinc-200 bg-white p-3 sm:p-4 text-center">
+          <p className="text-sm sm:text-lg font-semibold text-zinc-900 tabular-nums break-all">{formatCurrency(totalRevenue)}</p>
           <p className="text-xs text-zinc-500">{STAFF.TOTAL_REVENUE}</p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 text-center">
-          <p className="text-2xl font-semibold text-zinc-900">{member.shifts.length}</p>
+        <div className="rounded-lg border border-zinc-200 bg-white p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-semibold text-zinc-900">{member.shifts.length}</p>
           <p className="text-xs text-zinc-500">{STAFF.SHIFT_COUNT}</p>
         </div>
       </div>

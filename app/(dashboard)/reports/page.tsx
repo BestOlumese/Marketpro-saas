@@ -28,7 +28,7 @@ export default function ReportsPage() {
   const totalSales   = summary.data?.reduce((s, d) => s + d.count, 0) ?? 0
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-4 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageHeader title={REPORTS.SUMMARY_TITLE} description={REPORTS.DESCRIPTION} />
         <ExportButton from={from} to={to} />

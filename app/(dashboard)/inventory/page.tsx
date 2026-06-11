@@ -32,7 +32,7 @@ export default function InventoryPage() {
   const atLimit       = maxProducts !== Infinity && totalProducts >= maxProducts
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title={INVENTORY.TITLE}
         description={INVENTORY.DESCRIPTION}
